@@ -49,10 +49,9 @@ int main(int argc, char *argv[]) {
       size_t clu_j;
       std::vector<size_t> new_ivec;
 //      string key_clu = "clu";
-
-      while (ivectors.size()!=clusternum){        
+      int32 num = 1;
+      while ((clu_ivec.size()!=clusternum)|(num<50)){        
         BaseFloat vecSim_max=-1;      
-        int32 num = 1;
         for (size_t i = 0; i < ivectors.size(); i++) {
           for (size_t j = num; j< ivectors.size(); j++) {
             if (ivectors[i].first.compare(ivectors[j].first)!=0){
@@ -70,9 +69,7 @@ int main(int argc, char *argv[]) {
 	      }
             }
           }
-          num++;
         }
-        std::cout << ivectors.size()<< ' ' << vecSim_max << ' ' << ivectors[min_i].first << ' ' << ivectors[min_j].first <<' ' << min_i << ' ' << min_j<< "\n";
 //        if (ivectors[min_i].first.substr(0,3)==key_clu and ivectors[min_j].first.substr(0,3)==key_clu)
 
         if (ivectors[min_j].first.length()>ivectors[min_i].first.length()){
@@ -80,6 +77,7 @@ int main(int argc, char *argv[]) {
           min_i=min_j;
           min_j=temp;
         }
+        std::cout << clu_ivec.size()<< ' ' << vecSim_max << ' ' << ivectors[min_i].first << ' ' << ivectors[min_j].first <<' ' << min_i << ' ' << min_j<< ' ' << spk_num[min_i] << ' ' << spk_num[min_j] << "\n";
         std::string new_key = ivectors[min_i].first+"."+ivectors[min_j].first;
         double new_spk_num = spk_num[min_i]+spk_num[min_j];
         if (ivectors[min_i].first.length()!=4){
@@ -95,9 +93,15 @@ int main(int argc, char *argv[]) {
               }          
             }
             //clu_ivec[clu_i]에 clu_ivec[clu_j]를 병합
-            clu_ivec[clu_i].insert( clu_ivec[clu_i].end(), clu_ivec[clu_j].begin(), clu_ivec[clu_j].end() );
+            new_ivec=clu_ivec[clu_j];
             //clu_ivec[clu_j]를 삭제
             clu_ivec.erase(clu_ivec.begin()+clu_j);
+            //포인터값으로 실제로 new랑 clu_j랑 다른건지 확인하기
+            if (clu_j<clu_i){
+              clu_i=clu_i-1;
+            }
+            clu_ivec[clu_i].insert( clu_ivec[clu_i].end(), new_ivec.begin(), new_ivec.end() );
+            //new_ivec.clear();
           }
           else{
             //clu_ivec[clu_i]에min_j값 추가
@@ -108,6 +112,7 @@ int main(int argc, char *argv[]) {
           for (size_t i=0; i < clu_ivec[clu_i].size(); i++) {
             ivectors[clu_ivec[clu_i][i]].first=new_key;
             spk_num[clu_ivec[clu_i][i]]=new_spk_num;
+            //std::cout << ' ' << clu_ivec[clu_i].size() <<' ' << clu_i << ' ' << spk_num[clu_ivec[clu_i][i]]<< "\n";
           }
         }
         else{
@@ -120,7 +125,7 @@ int main(int argc, char *argv[]) {
           spk_num[min_i]=new_spk_num;
 	  spk_num[min_j]=new_spk_num;
         }
-
+        num++;
       }
       for (size_t m = 0; m < ivectors.size(); m++){
         for (size_t n = 0; n < clu_ivec.size(); n++){

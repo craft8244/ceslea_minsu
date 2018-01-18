@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   typedef std::string string;
   try {
     const char *usage =
-	"usage: cluster_test_v1 ark:utt.ark ark:exp/test/spk_ivector.ark savefile\n";
+	"usage: cluster_test_v2 scp:exp/ivectors_test/ivector.scp ark:exp/ivectors_train/spk_ivector.ark savefile\n";
 
     ParseOptions po(usage);
 
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
             min_j=j;
           }
         }
-        ko.Stream() << ivectors_utt[i].first << ' ' << min_j << std::endl; 
+        ko.Stream() << ivectors_utt[i].first << ' ' << ivectors[min_j].first << std::endl; 
       }
     } 
   } catch(const std::exception &e) {
